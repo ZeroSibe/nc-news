@@ -37,6 +37,14 @@ describe("GET /api", () => {
           });
         });
     });
+    test("GET 404 - should return appropriate status and message for bad path", () => {
+      return request(app)
+        .get("/api/topicss")
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Path Not Found");
+        });
+    });
   });
 
   describe("GET /api/articles", () => {
@@ -60,16 +68,25 @@ describe("GET /api", () => {
           });
         });
     });
+
     test("get 200 sort articles by date if no query is provided", () => {
       return request(app)
         .get("/api/articles")
         .expect(200)
         .then(({ body: { articles } }) => {
-            //.toBeSortedBy err, amended package.json - "setupFilesAfterEnv":[  "jest-extended/all" ]
           expect(articles).toBeSortedBy("created_at", {
             descending: true,
             coerce: true,
           });
+        });
+    });
+
+    test("GET 404 - should return appropriate status and message for bad path", () => {
+      return request(app)
+        .get("/api/articless")
+        .expect(404)
+        .then(({ body: { msg } }) => {
+          expect(msg).toBe("Path Not Found");
         });
     });
 
