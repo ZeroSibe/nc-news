@@ -4,6 +4,12 @@ exports.customErrors = (err, request, response, next) => {
   } else next(err);
 };
 
+exports.psqlErrors = (err, request, response, next) => {
+  if (err.code === "22P02") {
+    response.status(400).send({ msg: "Bad Request" });
+  } else next(err);
+};
+
 exports.serverErrors = (err, request, response, next) => {
   console.log(err);
   response.status(500).send({ msg: "Internal Server Error" });
