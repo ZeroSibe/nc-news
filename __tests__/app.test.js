@@ -272,6 +272,54 @@ describe("POST /api/articles/:article_id/comments", () => {
   });
 });
 
+describe("PATCH /api/articles/:article_id", () => {
+  test("PATCH 200 - responds with updated article", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({ inc_votes: -1 })
+      .expect(200)
+      .then(({ body: { article } }) => {
+        expect(article.votes).toBe(99);
+      });
+  });
+  test("PATCH 400 - responds with correct status and error message, when request has missing information", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({})
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request");
+      });
+  });
+  test("PATCH 400 - responds with correct status and error message, when request has wrong information", () => {
+    return request(app)
+      .patch("/api/articles/1")
+      .send({ inc_votes: "cat" })
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request");
+      });
+  });
+  test("PATCH 404 - responds with correct status and error message, when request has invalid id", () => {
+    return request(app)
+      .patch("/api/articles/999")
+      .send({ inc_votes: 1 })
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Not Found");
+      });
+  });
+  test("PATCH 400 - responds with correct status and error message, when request has invalid id type", () => {
+    return request(app)
+      .patch("/api/articles/cat")
+      .send({ inc_votes: 1 })
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request");
+      });
+  });
+});
+
 describe("Bad Path Error", () => {
   test("GET 404 - should return appropriate status and message for bad path", () => {
     return request(app)
