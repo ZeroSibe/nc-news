@@ -320,6 +320,28 @@ describe("PATCH /api/articles/:article_id", () => {
   });
 });
 
+describe("DELETE /api/comments/:comment_id", () => {
+  test("DELETE 204 - Deletes correct comment", () => {
+    return request(app).delete("/api/comments/2").expect(204);
+  });
+  test("DELETE 404 - sends correct status and error message when ID is not found", () => {
+    return request(app)
+      .delete("/api/comments/999")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Not Found");
+      });
+  });
+  test("DELETE 400 - send correct status and error message when ID is invalid", () => {
+    return request(app)
+      .delete("/api/comments/cat")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request");
+      });
+  });
+});
+
 describe("Bad Path Error", () => {
   test("GET 404 - should return appropriate status and message for bad path", () => {
     return request(app)
