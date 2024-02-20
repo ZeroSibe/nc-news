@@ -194,6 +194,84 @@ describe("GET /api", () => {
   });
 });
 
+describe("POST /api/articles/:article_id/comments", () => {
+  test("POST 201 - responds with the posted comment", () => {
+    const articleId = 1;
+    const body = {
+      username: "butter_bridge",
+      body: "Testing",
+    };
+    return request(app)
+      .post(`/api/articles/${articleId}/comments`)
+      .send(body)
+      .expect(201)
+      .then(({ body: { comment } }) => {
+        expect(comment).toMatchObject({
+          body: expect.any(String),
+          votes: expect.any(Number),
+          author: expect.any(String),
+          article_id: articleId,
+          created_at: expect.any(String),
+        });
+      });
+  });
+  test("POST 400 - responds with an appropriate status message when missing valid comment fields", () => {
+    const body = {
+      username: "icellusedkars",
+    };
+    const articleId = 2;
+    return request(app)
+      .post(`/api/articles/${articleId}/comments`)
+      .send(body)
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request");
+      });
+  });
+  test("POST 400 - responds with an appropriate status message when posting invalid comment fields", () => {
+    const body = {
+      username: 1,
+      Body: "Testing",
+    };
+    const articleId = 2;
+    return request(app)
+      .post(`/api/articles/${articleId}/comments`)
+      .send(body)
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request");
+      });
+  });
+  test("POST 400 - responds with an appropriate status message when posting with invalid article ID", () => {
+    const body = {
+      username: "icellusedkars",
+      Body: "Testing",
+    };
+    const articleId = "Jeff";
+    return request(app)
+      .post(`/api/articles/${articleId}/comments`)
+      .send(body)
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Bad Request");
+      });
+  });
+  test("POST 404 - responds with an appropriate status message when posting with valid but nonexistent article ID", () => {
+    const body = {
+      username: "butter_bridge",
+      body: "Testing",
+    };
+    const articleId = 999;
+    return request(app)
+      .post(`/api/articles/${articleId}/comments`)
+      .send(body)
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Not Found");
+      });
+  });
+});
+
 describe("Bad Path Error", () => {
   test("GET 404 - should return appropriate status and message for bad path", () => {
     return request(app)
