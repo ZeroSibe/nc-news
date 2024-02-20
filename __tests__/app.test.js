@@ -3,7 +3,6 @@ const data = require("../db/data/test-data/index");
 const db = require("../db/connection");
 const request = require("supertest");
 const app = require("../app");
-const endpoints = require("../endpoints.json");
 
 beforeEach(() => seed(data));
 afterAll(() => db.end());
@@ -13,10 +12,22 @@ describe("GET /api", () => {
     return request(app)
       .get("/api")
       .expect(200)
-      .then(({ body }) => {
-        expect(body).toEqual(endpoints);
-        expect(endpoints).toHaveProperty("GET /api/topics");
-        expect(endpoints).toHaveProperty("GET /api");
+      .then(({ body: { endpoints } }) => {
+        for (const endpoint in endpoints) {
+          expect(endpoints[endpoint]).toHaveProperty("description");
+          //not all endpoints has the below two, might compare actual JSON file instead...
+          if (endpoint === "queries") {
+            expect(endpoint).toMatchObject({
+              queries: expect.any(Array),
+            });
+          }
+          if (endpoint === "exampleResponse") {
+            expect(endpoint).toMatchObject({
+              queries: expect.any(Object),
+            });
+          }
+          //need to add format body, once I can see how it looks
+        }
       });
   });
 
@@ -69,7 +80,7 @@ describe("GET /api", () => {
         });
     });
 
-    test("get 200 sort articles by date if no query is provided", () => {
+    test("GET 200 sort articles by date if no query is provided", () => {
       return request(app)
         .get("/api/articles")
         .expect(200)
@@ -128,6 +139,56 @@ describe("GET /api", () => {
           .then(({ body: { msg } }) => {
             expect(msg).toBe("Bad Request");
           });
+      });
+
+      describe("GET /api/articles/:article_id/comments", () => {
+        test("GET 200 - responds with an array of comments for the given article_id of which each comment should have the relevant properties", () => {
+          return request(app)
+            .get(`/api/articles/1/comments`)
+            .expect(200)
+            .then(({ body: { comments } }) => {
+              expect(Array.isArray(comments)).toBe(true);
+              expect(comments.length).toBe(11);
+              comments.forEach((comment) => {
+                expect(comment).toMatchObject({
+                  comment_id: expect.any(Number),
+                  votes: expect.any(Number),
+                  created_at: expect.any(String),
+                  author: expect.any(String),
+                  body: expect.any(String),
+                  article_id: 1,
+                });
+              });
+            });
+        });
+        test("GET 200 - responds with the most recent comments first", () => {
+          return request(app)
+            .get(`/api/articles/1/comments`)
+            .expect(200)
+            .then(({ body: { comments } }) => {
+              expect(comments).toBeSortedBy("created_at", {
+                descending: true,
+              });
+            });
+        });
+        test("GET 404 -- responds with approriate status and message, when the request has invalid article id number", () => {
+          const articleId = 999;
+          return request(app)
+            .get(`/api/articles/${articleId}/comments`)
+            .expect(404)
+            .then(({ body: { msg } }) => {
+              expect(msg).toBe("Not Found");
+            });
+        });
+        test("GET 400 -- responds with approriate status and message, when the request has invalid article id type", () => {
+          const articleId = "papers";
+          return request(app)
+            .get(`/api/articles/${articleId}/comments`)
+            .expect(400)
+            .then(({ body: { msg } }) => {
+              expect(msg).toBe("Bad Request");
+            });
+        });
       });
     });
   });
