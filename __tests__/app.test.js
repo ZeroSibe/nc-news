@@ -189,6 +189,15 @@ describe("GET /api", () => {
               expect(msg).toBe("Bad Request");
             });
         });
+        test("GET 200 - responds with an empty array when a valid article id is passed but with no associated comments", () => {
+          return request(app)
+            .get(`/api/articles/2/comments`)
+            .expect(200)
+            .then(({ body: { comments } }) => {
+              expect(Array.isArray(comments)).toBe(true);
+              expect(comments.length).toBe(0);
+            });
+        });
       });
     });
   });
@@ -338,6 +347,38 @@ describe("DELETE /api/comments/:comment_id", () => {
       .expect(400)
       .then(({ body: { msg } }) => {
         expect(msg).toBe("Bad Request");
+      });
+  });
+});
+
+describe("GET /api/users", () => {
+  test("GET 200 - responds with an array of objects, each object with the relevant properties", () => {
+    return request(app)
+      .get("/api/users")
+      .expect(200)
+      .then(({ body: { users } }) => {
+        expect(users.length).toBe(4);
+        users.forEach((user) => {
+          expect(user).toMatchObject({
+            username: expect.any(String),
+            name: expect.any(String),
+            avatar_url: expect.any(String),
+          });
+          expect(users[0]).toEqual({
+            username: "butter_bridge",
+            name: "jonny",
+            avatar_url:
+              "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg",
+          });
+        });
+      });
+  });
+  test("GET 404 - should return appropriate status and message for bad path", () => {
+    return request(app)
+      .get("/users")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Path Not Found");
       });
   });
 });
