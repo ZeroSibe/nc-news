@@ -3,11 +3,19 @@ const {
   selectArticle,
   updateArticle,
 } = require("../models/articles.models");
+const { selectTopics } = require("../models/topics.models");
 
 exports.getAllArticles = (req, res, next) => {
-  selectArticle()
-    .then((articles) => {
-      res.status(200).send({ articles });
+  const { topic } = req.query;
+  const promises = [selectArticle(topic)];
+
+  if (topic) {
+    promises.push(selectTopics(topic));
+  }
+
+  Promise.all(promises)
+    .then((returnedPromises) => {
+      res.status(200).send({ articles: returnedPromises[0] });
     })
     .catch(next);
 };
