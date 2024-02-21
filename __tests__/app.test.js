@@ -103,6 +103,36 @@ describe("GET /api/articles", () => {
   });
 });
 
+describe("GET /api/articles ?topic", () => {
+  test("GET 200 - filters the articles by the topic value specified in the query", () => {
+    return request(app)
+      .get("/api/articles?topic=cats")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles.length).toBe(1);
+        articles.forEach((article) => {
+          expect(article.topic).toBe("cats");
+        });
+      });
+  });
+  test("GET 200 - responds with an empty array when topic value exists but has no associated articles", () => {
+    return request(app)
+      .get("/api/articles?topic=paper")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles.length).toBe(0);
+      });
+  });
+  test("GET 404 - if query value is valid but does not exist", () => {
+    return request(app)
+      .get("/api/articles?topic=turtles99")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Not Found");
+      });
+  });
+});
+
 describe("GET /api/articles/:article_id", () => {
   test("GET 200 /api/articles/:article_id - responds an article object, which should have the relevant properties", () => {
     const articleId = 2;

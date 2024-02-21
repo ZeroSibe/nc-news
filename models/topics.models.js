@@ -1,7 +1,16 @@
 const db = require("../db/connection");
 
-exports.selectTopics = () => {
-  return db.query(`SELECT * FROM topics`).then(({ rows }) => {
+exports.selectTopics = (topic) => {
+  const queryVals = [];
+  let sqlString = `SELECT * FROM topics`;
+  if (topic) {
+    sqlString += ` WHERE slug = $1`;
+    queryVals.push(topic);
+  }
+  return db.query(sqlString, queryVals).then(({ rows }) => {
+    if (rows.length === 0) {
+      return Promise.reject({ status: 404, msg: "Not Found" });
+    }
     return rows;
   });
 };
