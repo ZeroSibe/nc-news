@@ -7,9 +7,13 @@ const {
 
 exports.getCommentsById = (req, res, next) => {
   const { article_id } = req.params;
-  selectCommentsArticleByID(article_id)
-    .then((comments) => {
-      res.status(200).send({ comments });
+  const promises = [selectCommentsArticleByID(article_id)];
+  if (article_id) {
+    promises.push(selectArticleByID(article_id));
+  }
+  Promise.all(promises)
+    .then((returnedPromises) => {
+      res.status(200).send({ comments: returnedPromises[0] });
     })
     .catch(next);
 };
