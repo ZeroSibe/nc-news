@@ -4,19 +4,19 @@ const db = require("../db/connection");
 const request = require("supertest");
 const app = require("../app");
 const { convertTimestampToDate } = require("../db/seeds/utils");
+const fs = require("fs");
 
 beforeEach(() => seed(data));
 afterAll(() => db.end());
 
 describe("GET /api", () => {
-  test("GET 200 - responds with an object describing all the avalable endpoints on your API", () => {
+  test("GET 200 - responds with an object describing some of the relevant avalable endpoints on your API", () => {
     return request(app)
       .get("/api")
       .expect(200)
       .then(({ body: { endpoints } }) => {
         for (const endpoint in endpoints) {
           expect(endpoints[endpoint]).toHaveProperty("description");
-          //not all endpoints has the below two, might compare actual JSON file instead...
           if (endpoint === "queries") {
             expect(endpoint).toMatchObject({
               queries: expect.any(Array),
@@ -27,8 +27,18 @@ describe("GET /api", () => {
               queries: expect.any(Object),
             });
           }
-          //need to add format body, once I can see how it looks
         }
+      });
+  });
+  test("GET 200 - Responds with an object describing all the available endpoints on your API", () => {
+    const expectedOutput = JSON.parse(
+      fs.readFileSync("./endpoints.json", "utf8")
+    );
+    return request(app)
+      .get("/api")
+      .expect(200)
+      .then(({ body: { endpoints } }) => {
+        expect(endpoints).toEqual(expectedOutput);
       });
   });
 
@@ -129,7 +139,7 @@ describe("GET /api/articles ?topic", () => {
       .get("/api/articles?topic=turtles99")
       .expect(404)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Not Found");
+        expect(msg).toBe("Topic Not Found");
       });
   });
 });
@@ -161,7 +171,7 @@ describe("GET /api/articles/:article_id", () => {
       .get(`/api/articles/${articleId}`)
       .expect(404)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Not Found");
+        expect(msg).toBe("Article Not Found");
       });
   });
   test("GET 400 - responds with approriate status and message, when the request has invalid article id type", () => {
@@ -242,7 +252,7 @@ describe("GET /api/articles/:article_id/comments", () => {
       .get(`/api/articles/${articleId}/comments`)
       .expect(404)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Not Found");
+        expect(msg).toBe("Article Not Found");
       });
   });
   test("GET 400 -- responds with approriate status and message, when the request has invalid article id type", () => {
@@ -338,7 +348,7 @@ describe("POST /api/articles/:article_id/comments", () => {
       .send(body)
       .expect(404)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Not Found");
+        expect(msg).toBe("Article Not Found");
       });
   });
 });
@@ -377,7 +387,7 @@ describe("PATCH /api/articles/:article_id", () => {
       .send({ inc_votes: 1 })
       .expect(404)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Not Found");
+        expect(msg).toBe("Article Not Found");
       });
   });
   test("PATCH 400 - responds with correct status and error message, when request has invalid id type", () => {
@@ -400,7 +410,7 @@ describe("DELETE /api/comments/:comment_id", () => {
       .delete("/api/comments/999")
       .expect(404)
       .then(({ body: { msg } }) => {
-        expect(msg).toBe("Not Found");
+        expect(msg).toBe("Comment Not Found");
       });
   });
   test("DELETE 400 - send correct status and error message when ID is invalid", () => {
