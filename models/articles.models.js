@@ -33,7 +33,7 @@ exports.selectArticleByID = (article_id) => {
     )
     .then(({ rows }) => {
       if (rows.length === 0) {
-        return Promise.reject({ status: 404, msg: "Not Found" });
+        return Promise.reject({ status: 404, msg: "Article Not Found" });
       }
       return rows[0];
     });
@@ -50,7 +50,7 @@ exports.updateArticle = (articleId, newVote) => {
     )
     .then(({ rows }) => {
       if (rows.length === 0) {
-        return Promise.reject({ status: 404, msg: "Not Found" });
+        return Promise.reject({ status: 404, msg: "Article Not Found" });
       }
       return rows[0];
     });
