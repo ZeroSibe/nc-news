@@ -4,7 +4,6 @@ const db = require("../db/connection");
 const request = require("supertest");
 const app = require("../app");
 const { convertTimestampToDate } = require("../db/seeds/utils");
-const fs = require("fs");
 
 beforeEach(() => seed(data));
 afterAll(() => db.end());
@@ -31,9 +30,7 @@ describe("GET /api", () => {
       });
   });
   test("GET 200 - Responds with an object describing all the available endpoints on your API", () => {
-    const expectedOutput = JSON.parse(
-      fs.readFileSync("./endpoints.json", "utf8")
-    );
+    const expectedOutput = require("../endpoints.json", "utf8");
     return request(app)
       .get("/api")
       .expect(200)
