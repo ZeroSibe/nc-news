@@ -35,13 +35,6 @@ jobs:
             postgresql user: zero_cutiepie
         - name: run tests
           run: PGDATABASE=test_database PGPASSWORD=password PGUSER=zero_cutiepie npm run test-app
-    test-with-live-db:
-        steps:
-            - name: clone repo and checkout main
-              uses: actions/checkout@v4
-            - name: install our dependendencies
-              run: npm install
-            - name: run tests
-              run: NODE_ENV=production DATABASE_URL=${{secrets.DATABASE_URL}} npm run test-app
+
 
 
