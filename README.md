@@ -13,16 +13,17 @@ To run this project locally, you can clone this project and run in your own envi
 - In your terminal `git clone https://github.com/ZeroSibe/nc-news.git `
 
 2. In your terminal run `npm install` - to install all the dependencies.
-3. This project requires two `.env` files
+3. Run Tests
+
+- you can run all the test suites, run the script `npm run test` in your terminal to check
+
+4. This project requires two `.env` files
 
 - create your enviroment variables in a `.env.test` and `.env.development` file
 
 - into each file add the database name `PGDATABASE = <database_name_here>`
 
-4. To create and seed your local databases, run the scripts `npm run setup-dbs` in your terminal, and then run `npm run seed`
-5. Testing
-
-- you can run all the test suites, run the script `npm run test` in your terminal to check
+5. To create and seed your local databases, run the scripts `npm run setup-dbs` in your terminal, and then run `npm run seed`
 
 6. To run the server with the development data, in your terminal run `npm run start`
 
