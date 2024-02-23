@@ -191,6 +191,17 @@ describe("GET /api/articles ?order (sorting queries)", () => {
         expect(msg).toBe("Invalid order query");
       });
   });
+  test("GET 200 - orders to descending if specified in query", () => {
+    return request(app)
+      .get("/api/articles?sort_by=comment_count&&order=desc")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSortedBy("comment_count", {
+          coerce: true,
+          descending: true,
+        });
+      });
+  });
 });
 
 describe("GET /api/articles/:article_id", () => {
