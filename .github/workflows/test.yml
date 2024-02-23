@@ -1,11 +1,12 @@
-name: Test & Deploy
+name: Test
 on:
   pull_request:
-    branches: -main
+    branches:
+      - main
 
 jobs:
   greeting:
     runs-on: ubuntu-latest
     steps:
       - name: say hello
-        run: echo 'hello you!'
+        run: echo 'hello...'
