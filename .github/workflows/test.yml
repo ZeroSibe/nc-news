@@ -1,11 +1,42 @@
-name: Test & Deploy
+name: Test
 on:
   pull_request:
-    branches: -main
+    branches:
+      - main
 
 jobs:
   greeting:
     runs-on: ubuntu-latest
     steps:
       - name: say hello
-        run: echo 'hello you!'
+        run: echo 'hello...'
+  test-utils:
+    runs-on: ubuntu-latest
+    steps:
+      - name: clone repo and checkout main
+        uses: actions/checkout@v4
+      - name: install our dependencies
+        run: npm install
+      - name: run tests
+        run: npm run test-utils
+  test-app:
+    runs-on: ubuntu-latest
+    needs: test-utils
+    steps:
+      - name: clone repo and checkout main
+        uses: actions/checkout@v4
+      - name: install our dependencies
+        run: npm install
+      - name: setup of psql
+        uses: harmon758/postgresql-action@v1
+        with:
+            postgresql db: test_database
+            postgresql password: password
+            postgresql user: zero_cutiepie
+      - name: run tests
+        run: PGDATABASE=test_database PGPASSWORD=password PGUSER=zero_cutiepie npm run test-app
+
+  
+
+
+
