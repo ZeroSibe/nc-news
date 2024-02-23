@@ -1,6 +1,21 @@
 const db = require("../db/connection");
 
-exports.selectArticle = (topic) => {
+exports.selectArticle = (sort_by = "created_at", order = "desc", topic) => {
+  const validSortBys = [
+    "title",
+    "topic",
+    "author",
+    "article_id",
+    "created_at",
+    "votes",
+    "comment_count",
+  ];
+  if (!validSortBys.includes(sort_by)) {
+    return Promise.reject({ status: 400, msg: "Invalid sort query" });
+  }
+  if (!["asc", "desc"].includes(order)) {
+    return Promise.reject({ status: 400, msg: "Invalid order query" });
+  }
   const queryVals = [];
   let sqlString = `SELECT articles.author, articles.title, articles.article_id, articles.topic, articles.created_at, articles.votes, articles.article_img_url, 
   ROUND(COUNT(comments.comment_id)) AS comment_count
@@ -13,7 +28,7 @@ exports.selectArticle = (topic) => {
   }
 
   sqlString += ` GROUP BY articles.article_id
-  ORDER BY articles.created_at DESC;`;
+  ORDER BY ${sort_by} ${order};`;
 
   return db.query(sqlString, queryVals).then(({ rows }) => {
     return rows;

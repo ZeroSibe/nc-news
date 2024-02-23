@@ -141,6 +141,58 @@ describe("GET /api/articles ?topic", () => {
   });
 });
 
+describe("GET /api/articles ?sort_by (sorting queries)", () => {
+  test("GET 200 - sorts articles by any valid query column", () => {
+    return request(app)
+      .get("/api/articles?sort_by=topic")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSortedBy("topic", {
+          coerce: true,
+          descending: true,
+        });
+      });
+  });
+  test("GET 400 - sends an appropriate status and error message for invalid query", () => {
+    return request(app)
+      .get("/api/articles?sort_by=body")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Invalid sort query");
+      });
+  });
+});
+
+describe("GET /api/articles ?order (sorting queries)", () => {
+  test("GET 200 - defaults to descending if no order query is included", () => {
+    return request(app)
+      .get("/api/articles?sort_by=topic")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSortedBy("created_at", {
+          coerce: true,
+          descending: true,
+        });
+      });
+  });
+  test("GET 200 - orders to ascending if specified in query", () => {
+    return request(app)
+      .get("/api/articles?order=asc")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles).toBeSortedBy("created_at");
+      });
+  });
+  test("GET 400 - sends an appropriate status and error message for invalid query", () => {
+    return request(app)
+      .get("/api/articles?order=descending")
+      .expect(400)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Invalid order query");
+      });
+  });
+});
+
 describe("GET /api/articles/:article_id", () => {
   test("GET 200 /api/articles/:article_id - responds an article object, which should have the relevant properties", () => {
     const articleId = 2;
