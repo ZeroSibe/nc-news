@@ -70,3 +70,26 @@ exports.updateArticle = (articleId, newVote) => {
       return rows[0];
     });
 };
+
+exports.selectArticlesByTopic = (topic) => {
+  return db
+    .query(`SELECT * FROM topics WHERE slug = $1`, [topic])
+    .then(({ rows }) => {
+      if (rows.length === 0) {
+        return Promise.reject({ status: 404, msg: "Topic not found" });
+      }
+      return db.query(
+        `SELECT articles.article_id, articles.author, articles.title, articles.topic, articles.created_at, articles.votes, articles.article_img_url, 
+        COUNT(comments.comment_id)::INT AS comment_count 
+        FROM articles 
+        LEFT JOIN comments ON articles.article_id = comments.article_id 
+        WHERE topic = $1 
+        GROUP BY articles.article_id 
+        ORDER BY created_at`,
+        [topic]
+      );
+    })
+    .then(({ rows }) => {
+      return rows;
+    });
+};

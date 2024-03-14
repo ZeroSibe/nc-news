@@ -14,3 +14,4 @@ exports.selectTopics = (topic) => {
     return rows;
   });
 };
+
