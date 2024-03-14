@@ -67,6 +67,43 @@ describe("GET /api", () => {
   });
 });
 
+describe("GET /api/topics/:topic", () => {
+  test("GET 200 - responds with an array of all articles of selected topics", () => {
+    return request(app)
+      .get("/api/topics/cats")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles.length).toBe(1);
+        articles.forEach((article) => {
+          expect(article).toMatchObject({
+            title: expect.any(String),
+            topic: expect.any(String),
+            author: expect.any(String),
+            created_at: expect.any(String),
+            votes: expect.any(Number),
+            article_img_url: expect.any(String),
+          });
+        });
+      });
+  });
+  test("GET 200 - responds with an empty array if article doesn't exist but the topic does", () => {
+    return request(app)
+      .get("/api/topics/paper")
+      .expect(200)
+      .then(({ body: { articles } }) => {
+        expect(articles.length).toBe(0);
+      });
+  });
+  test("GET 404 - if query value is valid but does not exist", () => {
+    return request(app)
+      .get("/api/topics/turtles99")
+      .expect(404)
+      .then(({ body: { msg } }) => {
+        expect(msg).toBe("Topic not found");
+      });
+  });
+});
+
 describe("GET /api/articles", () => {
   test("GET 200 - responds with an articles array of article objects with the relevant properties", () => {
     return request(app)

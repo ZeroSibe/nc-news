@@ -46,6 +46,10 @@ responds with JSON listing all the available endpoints
 
 responds with a list of topics
 
+### GET /api/topics/:topic
+
+responds with a list of related articles
+
 #### **GET /api/articles**
 
 responds with a list of articles
