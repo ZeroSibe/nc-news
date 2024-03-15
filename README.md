@@ -3,6 +3,7 @@
 I have built a news API using Node.js and Express, the backend is PSQL.
 
 You can find the hosted version of the API here https://nc-news-izio.onrender.com/api/
+along with the available endpoints.
 
 ## Project Set-Up:
 
@@ -38,29 +39,7 @@ This project is running on:
 
 ---
 
-#### **GET /api**
-
-responds with JSON listing all the available endpoints
-
-#### **GET /api/topics**
-
-responds with a list of topics
-
-### GET /api/topics/:topic
-
-responds with a list of related articles
-
-#### **GET /api/articles**
-
-responds with a list of articles
-
-#### **GET /api/users**
-
-responds with a list of users
-
-#### **GET /api/articles (queries)**
-
-allows articles to be filtered and sorted
+##### Further Endpoints available
 
 #### **GET /api/articles/:article_id**
 

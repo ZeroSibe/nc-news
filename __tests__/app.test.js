@@ -73,6 +73,7 @@ describe("GET /api/topics/:topic", () => {
       .get("/api/topics/cats")
       .expect(200)
       .then(({ body: { articles } }) => {
+        
         expect(articles.length).toBe(1);
         articles.forEach((article) => {
           expect(article).toMatchObject({
